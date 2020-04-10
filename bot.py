@@ -39,6 +39,7 @@ def updateStats(playerHand):
 @client.event
 async def on_ready():
     print("Bot Online!")
+    await client.change_presence(activity=discord.Game(name="at Andrew's virtual casino"))
 
 @client.command()
 async def test(ctx):
