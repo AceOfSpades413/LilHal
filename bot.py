@@ -7,6 +7,7 @@ client = commands.Bot(command_prefix='!')
 
 tFile = open("token.txt", "r")
 TOKEN = tFile.readline().strip("\n")
+activeGames={}
 
 def endGame(dealerScore, playerScore, ctx):
     if playerScore > dealerScore:
@@ -15,6 +16,8 @@ def endGame(dealerScore, playerScore, ctx):
         return("You lose.")
     else:
         return("You tied.")
+
+
 def calcScore(cards):
     score = 0
     for card in cards:
@@ -54,11 +57,17 @@ async def bj(ctx):
     embed.add_field(name="|", value="|")
     embed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
     await ctx.send(embed=embed)
+    activeGames[str(ctx.author)]="waitHit"
 
 
+
+@client.event
+async def on_message(message):
+    if(message.content.lower()=="hit" and activeGames[str(message.author)]=="waitHit"):
+        activeGames[str(message.author)]="hit"
+        print("set hit")
+
+    await client.process_commands(message)
 
 
 client.run(TOKEN)
-
-
-
