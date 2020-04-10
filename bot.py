@@ -91,7 +91,7 @@ async def bj(ctx):
                 activeUsers.pop(i)
                 return
 
-            if response.content=="hit":
+            if response.content.lower()=="hit":
                 playerHand.append(deck.GetRandomCard())
                 playerScore, playerString = updateStats(playerHand)
                 newembed = discord.Embed(title="Blackjack: " + str(ctx.author))
@@ -101,7 +101,7 @@ async def bj(ctx):
                 await thisMessage.edit(embed=newembed)
                 invalid = False
                 moveCounterPlayer+=1
-            elif response.content=="stand":
+            elif response.content.lower()=="stand":
                 stay= True
                 invalid = False
 
