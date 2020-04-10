@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import random
 from classes.CardgameUtils import Card, Deck
+import math
 
 client = commands.Bot(command_prefix='!')
 
@@ -53,7 +54,13 @@ async def on_ready():
 
 
 @client.command()
-async def bj(ctx):
+async def bj(ctx, money="failure"):
+    if money=="failure":
+        await ctx.send("Proper usage: `!bj <bet amount>`")
+        return
+    if float(money)<=0 or float(money)-math.trunc(float(money))!=0:
+        await ctx.send("Bet amount must be a non-zero positive integer")
+        return
     if ctx.author in activeUsers:
         await ctx.send("You already have a game!")
         return
@@ -120,6 +127,7 @@ async def bj(ctx):
 
         if playerScore==21 and moveCounterPlayer==0 and (dealerScore<21 or moveCounterDealer>0):
             result="BLACKJACK"
+            print("bj")
             await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
                                 discord.Color.green())
 
@@ -133,7 +141,7 @@ async def bj(ctx):
             moveCounterDealer+=1
             dealerScore, dealerString = updateStats(dealerHand)
 
-        if not result=="blackjack" and not result =="loss":
+        if not result=="BLACKJACK" and not result =="LOSS":
             if dealerScore>21:
                 result="WIN"
                 await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
