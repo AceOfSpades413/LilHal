@@ -22,7 +22,7 @@ class Card:
         else:
             return self.value
     def __str__(self):
-        return str(self.getCardFace())+" of " + self.getSuit()
+        return str(self.getCardFace()) + self.getSuit()
 
 class Deck:
     def __init__(self):
