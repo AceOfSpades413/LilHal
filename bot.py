@@ -70,20 +70,27 @@ async def bj(ctx):
         dealerString += "   ? "
     dealerScore = calcScore([dealerHand[0]])
     embed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-    embed.add_field(name="|", value="|")
+    #embed.add_field(name="|", value="|")
     embed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
     thisMessage = await ctx.send(embed=embed)
     stay=False
     while(playerScore<21 and stay == False):
         invalid = True
         while invalid:
-            response = await client.wait_for('message', check = lambda message: message.author==ctx.author, timeout=30)
+            try:
+                response = await client.wait_for('message', check = lambda message: message.author==ctx.author, timeout=30)
+            except:#maybe player loses money here?
+                await thisMessage.edit(embed=discord.Embed(title="Blackjack: " + str(ctx.author), description="GAME TIMEOUT"))
+                i = activeUsers.index(ctx.author)
+                activeUsers.pop(i)
+                return
+
             if response.content=="hit":
                 playerHand.append(deck.GetRandomCard())
                 playerScore, playerString = updateStats(playerHand)
                 newembed = discord.Embed(title="Blackjack: " + str(ctx.author))
                 newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                newembed.add_field(name="|", value="|")
+                #newembed.add_field(name="|", value="|")
                 newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
                 await thisMessage.edit(embed=newembed)
                 invalid = False
@@ -97,7 +104,7 @@ async def bj(ctx):
         dealerScore, dealerString = updateStats(dealerHand)
         newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: BUST",color=discord.Color.dark_red())
         newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-        newembed.add_field(name="|", value="|")
+        #newembed.add_field(name="|", value="|")
         newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
         await thisMessage.edit(embed=newembed)
         result="loss"
@@ -106,7 +113,7 @@ async def bj(ctx):
         if playerScore==21 and dealerScore==21 and moveCounterPlayer==0 and moveCounterDealer==0:
             newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: TIE",color=discord.Color.blue())
             newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-            newembed.add_field(name="|", value="|")
+            #newembed.add_field(name="|", value="|")
             newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
             await thisMessage.edit(embed=newembed)
             result = "tie"
@@ -114,7 +121,7 @@ async def bj(ctx):
         if playerScore==21 and moveCounterPlayer==0 and (dealerScore<21 or moveCounterDealer>0):
             newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: BLACKJACK",color=discord.Color.green())
             newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-            newembed.add_field(name="|", value="|")
+            #newembed.add_field(name="|", value="|")
             newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
             await thisMessage.edit(embed=newembed)
             result="blackjack"
@@ -122,7 +129,7 @@ async def bj(ctx):
         if dealerScore==21 and moveCounterDealer==0 and (playerScore<21 or moveCounterPlayer>0):
             newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: LOSS",color=discord.Color.dark_red())
             newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-            newembed.add_field(name="|", value="|")
+            #newembed.add_field(name="|", value="|")
             newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
             await thisMessage.edit(embed=newembed)
             result = "loss"
@@ -136,7 +143,7 @@ async def bj(ctx):
             if dealerScore>21:
                 newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: DEALER BUST",color=discord.Color.green())
                 newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                newembed.add_field(name="|", value="|")
+                #newembed.add_field(name="|", value="|")
                 newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
                 await thisMessage.edit(embed=newembed)
                 result="win"
@@ -145,7 +152,7 @@ async def bj(ctx):
                 newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: TIE",
                                          color=discord.Color.blue())
                 newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                newembed.add_field(name="|", value="|")
+                #newembed.add_field(name="|", value="|")
                 newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
                 await thisMessage.edit(embed=newembed)
                 result="tie"
@@ -153,7 +160,7 @@ async def bj(ctx):
                 newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: WIN",
                                          color=discord.Color.green())
                 newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                newembed.add_field(name="|", value="|")
+                #newembed.add_field(name="|", value="|")
                 newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
                 await thisMessage.edit(embed=newembed)
                 result="win"
@@ -161,7 +168,7 @@ async def bj(ctx):
             elif (playerScore < dealerScore):
                 newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: LOSS",color=discord.Color.dark_red())
                 newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                newembed.add_field(name="|", value="|")
+                #newembed.add_field(name="|", value="|")
                 newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
                 await thisMessage.edit(embed=newembed)
                 result="loss"
