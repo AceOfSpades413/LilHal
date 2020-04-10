@@ -7,15 +7,7 @@ client = commands.Bot(command_prefix='!')
 
 tFile = open("token.txt", "r")
 TOKEN = tFile.readline().strip("\n")
-activeGames={}
 
-def endGame(dealerScore, playerScore, ctx):
-    if playerScore > dealerScore:
-        return("You win!")
-    elif playerScore < dealerScore:
-        return("You lose.")
-    else:
-        return("You tied.")
 
 def calcScore(cards):
     score = 0
