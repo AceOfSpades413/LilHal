@@ -7,6 +7,7 @@ client = commands.Bot(command_prefix='!')
 
 tFile = open("token.txt", "r")
 TOKEN = tFile.readline().strip("\n")
+activeUsers=[]
 
 
 def calcScore(cards):
@@ -47,6 +48,10 @@ async def test(ctx):
 
 @client.command()
 async def bj(ctx):
+    if ctx.author in activeUsers:
+        await ctx.send("You already have a game!")
+        return
+    activeUsers.append(ctx.author)
     playerHand=[]
     dealerHand=[]
     playerScore=0
