@@ -5,6 +5,7 @@ from classes.CardgameUtils import Card, Deck
 import math
 
 client = commands.Bot(command_prefix='!')
+client.remove_command('help')
 
 tFile = open("token.txt", "r")
 TOKEN = tFile.readline().strip("\n")
@@ -115,7 +116,7 @@ async def bj(ctx, money="failure"):
     result=""
     if playerScore > 21:
         dealerScore, dealerString = updateStats(dealerHand)
-        result = "LOSS"
+        result = "BUST"
         await updateBJEmbed(thisMessage,ctx,playerString, dealerString, playerScore, dealerScore, result, discord.Color.red())
 
     else:
