@@ -165,6 +165,9 @@ async def bj(ctx):
                 newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
                 await thisMessage.edit(embed=newembed)
                 result="loss"
+    i=activeUsers.index(ctx.author)
+    activeUsers.pop(i)
+
 
 
 
