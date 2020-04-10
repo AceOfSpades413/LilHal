@@ -26,9 +26,18 @@ def calcScore(cards):
                 score+=1
             else:
                 score+=11
-
-
     return score
+
+async def updateBJEmbed(messageID, ctx, playerString, dealerString, playerScore, dealerScore, result, color):
+    if result=="":
+        desc=""
+    else:
+        desc="Result: "+result
+    newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description=desc, color=color)
+    newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
+    # newembed.add_field(name="|", value="|")
+    newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
+    await messageID.edit(embed=newembed)
 
 def updateStats(playerHand):
     score = calcScore(playerHand)
@@ -102,37 +111,25 @@ async def bj(ctx):
     result=""
     if playerScore > 21:
         dealerScore, dealerString = updateStats(dealerHand)
-        newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: BUST",color=discord.Color.dark_red())
-        newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-        #newembed.add_field(name="|", value="|")
-        newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-        await thisMessage.edit(embed=newembed)
-        result="loss"
+        result = "LOSS"
+        await updateBJEmbed(thisMessage,ctx,playerString, dealerString, playerScore, dealerScore, result, discord.Color.red())
+
     else:
         dealerScore, dealerString = updateStats(dealerHand)
         if playerScore==21 and dealerScore==21 and moveCounterPlayer==0 and moveCounterDealer==0:
-            newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: TIE",color=discord.Color.blue())
-            newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-            #newembed.add_field(name="|", value="|")
-            newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-            await thisMessage.edit(embed=newembed)
-            result = "tie"
+            result = "TIE"
+            await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
+                                discord.Color.blue())
 
         if playerScore==21 and moveCounterPlayer==0 and (dealerScore<21 or moveCounterDealer>0):
-            newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: BLACKJACK",color=discord.Color.green())
-            newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-            #newembed.add_field(name="|", value="|")
-            newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-            await thisMessage.edit(embed=newembed)
-            result="blackjack"
+            result="BLACKJACK"
+            await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
+                                discord.Color.green())
 
         if dealerScore==21 and moveCounterDealer==0 and (playerScore<21 or moveCounterPlayer>0):
-            newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: LOSS",color=discord.Color.dark_red())
-            newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-            #newembed.add_field(name="|", value="|")
-            newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-            await thisMessage.edit(embed=newembed)
-            result = "loss"
+            result = "LOSS"
+            await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
+                                discord.Color.red())
 
         while (dealerScore < playerScore and dealerScore < 21): #Dealer Hit, DO NOT EXCLUDE IF NOT BLACKJACK
             dealerHand.append(deck.GetRandomCard())
@@ -141,37 +138,23 @@ async def bj(ctx):
 
         if not result=="blackjack" and not result =="loss":
             if dealerScore>21:
-                newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: DEALER BUST",color=discord.Color.green())
-                newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                #newembed.add_field(name="|", value="|")
-                newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-                await thisMessage.edit(embed=newembed)
-                result="win"
+                result="WIN"
+                await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
+                                    discord.Color.green())
 
             elif (playerScore == dealerScore):
-                newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: TIE",
-                                         color=discord.Color.blue())
-                newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                #newembed.add_field(name="|", value="|")
-                newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-                await thisMessage.edit(embed=newembed)
-                result="tie"
+                result="TIE"
+                await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
+                                    discord.Color.blue())
             elif (playerScore > dealerScore):
-                newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: WIN",
-                                         color=discord.Color.green())
-                newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                #newembed.add_field(name="|", value="|")
-                newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-                await thisMessage.edit(embed=newembed)
-                result="win"
+                result="WIN"
+                await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
+                                    discord.Color.green())
 
             elif (playerScore < dealerScore):
-                newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description="Result: LOSS",color=discord.Color.dark_red())
-                newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-                #newembed.add_field(name="|", value="|")
-                newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-                await thisMessage.edit(embed=newembed)
-                result="loss"
+                result="LOSS"
+                await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
+                                    discord.Color.red())
     i=activeUsers.index(ctx.author)
     activeUsers.pop(i)
 
