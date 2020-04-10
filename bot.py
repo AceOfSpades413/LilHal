@@ -51,9 +51,6 @@ async def on_ready():
     print("Bot Online!")
     await client.change_presence(activity=discord.Game(name="at Andrew's virtual casino"))
 
-@client.command()
-async def test(ctx):
-    await ctx.send("test")
 
 @client.command()
 async def bj(ctx):
