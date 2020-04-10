@@ -8,25 +8,6 @@ client = commands.Bot(command_prefix='!')
 tFile = open("token.txt", "r")
 TOKEN = tFile.readline().strip("\n")
 
-@client.event
-async def on_ready():
-    print("Bot Online!")
-
-@client.command()
-async def bj(ctx):
-    deck = Deck()
-    playerHand = deck.deal(2)
-    dealerHand = deck.deal(2)
-    for x in playerHand:
-        await ctx.send(x)
-
-
-
-
-
-
-
-client.run(TOKEN)
 
 def calcScore(cards):
     score = 0
@@ -41,4 +22,35 @@ def calcScore(cards):
             else:
                 score+=11
     return score
+
+@client.event
+async def on_ready():
+    print("Bot Online!")
+
+@client.command()
+async def bj(ctx):
+    deck = Deck()
+    playerHand = deck.deal(2)
+    dealerHand = deck.deal(2)
+
+    playerScore = calcScore(playerHand)
+    embed = discord.Embed(title="Blackjack: "+ str(ctx.author))
+
+    playerString = ""
+    for card in playerHand:
+        playerString += (str(card) + " ")
+
+    dealerString=str(dealerHand[0])
+    for i in range(len(dealerHand)-1):
+        dealerString += "   ? "
+    dealerScore = calcScore([dealerHand[0]])
+    embed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
+    embed.add_field(name="|", value="|")
+    embed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
+    await ctx.send(embed=embed)
+
+
+client.run(TOKEN)
+
+
 
