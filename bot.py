@@ -128,7 +128,6 @@ async def bj(ctx, money="failure"):
 
         if playerScore==21 and moveCounterPlayer==0 and (dealerScore<21 or moveCounterDealer>0):
             result="BLACKJACK"
-            print("bj")
             await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
                                 discord.Color.green())
 
