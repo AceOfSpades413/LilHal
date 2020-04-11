@@ -36,10 +36,10 @@ class Deck:
     def deal(self, num):
         cards = []
         for x in range(num):
-            cards.append(self.GetRandomCard())
+            cards.append(self.getRandomCard())
         return cards
 
-    def GetRandomCard(self):
+    def getRandomCard(self):
         pos = random.randint(0, len(self.cards) - 1)
         card=self.cards[pos]
         self.cards.pop(pos)

@@ -102,7 +102,7 @@ async def bj(ctx, money="failure"):
                 return
 
             if response.content.lower()=="hit":
-                playerHand.append(deck.GetRandomCard()) #gives player new card
+                playerHand.append(deck.getRandomCard()) #gives player new card
                 playerScore, playerString = updateStats(playerHand) #calculates players new card total
                 newembed = discord.Embed(title="Blackjack: " + str(ctx.author)) #updates game message
                 newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
@@ -139,7 +139,7 @@ async def bj(ctx, money="failure"):
                                 discord.Color.red())
 
         while (dealerScore < playerScore and dealerScore < 21): #Dealer Hit, DO NOT EXCLUDE IF NOT BLACKJACK
-            dealerHand.append(deck.GetRandomCard())
+            dealerHand.append(deck.getRandomCard())
             moveCounterDealer+=1
             dealerScore, dealerString = updateStats(dealerHand)
 
