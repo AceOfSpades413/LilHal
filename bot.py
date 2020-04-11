@@ -95,13 +95,11 @@ async def bj(ctx, money="failure"):
         while invalid: #checks to see if responded with hit/stay
             try:
                 response = await client.wait_for('message', check = lambda message: message.author==ctx.author, timeout=30) #checks to see whether player sends msg within 30 secs
+                move=response.content.lower()
             except: #forces stand here
-                await thisMessage.edit(embed=discord.Embed(title="Blackjack: " + str(ctx.author), description="GAME TIMEOUT"))
-                i = activeUsers.index(ctx.author) #gets pos of player in list
-                activeUsers.pop(i) #removes player based on pos
-                return
+                move="stand"
 
-            if response.content.lower()=="hit":
+            if move=="hit":
                 playerHand.append(deck.getRandomCard()) #gives player new card
                 playerScore, playerString = updateStats(playerHand) #calculates players new card total
                 newembed = discord.Embed(title="Blackjack: " + str(ctx.author)) #updates game message
@@ -111,7 +109,7 @@ async def bj(ctx, money="failure"):
                 await thisMessage.edit(embed=newembed)
                 invalid = False
                 moveCounterPlayer+=1
-            elif response.content.lower()=="stand":
+            elif move=="stand":
                 stay= True
                 invalid = False
 
