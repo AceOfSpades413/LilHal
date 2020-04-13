@@ -158,6 +158,9 @@ async def bj(ctx, money="failure"):
     if ctx.author in activeUsers:
         await ctx.send("You already have a game!")
         return
+    if getUserCashBalance(ctx.author, ctx.guild)>money:
+        await ctx.send("You do not have that much money")
+        return
     money=int(money)
     modifyUserBalance(ctx.message.author, ctx.message.guild, -1*money)
     activeUsers.append(ctx.author)
@@ -241,7 +244,7 @@ async def bj(ctx, money="failure"):
     activeUsers.pop(i) #removes player after game ends based on pos
     if result == "BLACKJACK":
         winnings=money*2.5
-        resultString = "Blackjack: +" + getCurrencySymbol(ctx) + str(money*1.5)
+        resultString = "Blackjack: +" + getCurrencySymbol(ctx) + str(int(money*1.5))
         await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
                             discord.Color.green())
     elif result == "WIN":
