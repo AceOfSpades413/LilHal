@@ -57,6 +57,9 @@ async def dumpJson(ctx):
 async def setCurrencySymbol(ctx, symbol):
     servers[str(ctx.message.guild.id)]["currencySymbol"]=str(symbol)
 
+def getCurrencySymbol(ctx):
+    return servers[str(ctx.message.guild.id)]["currencySymbol"]
+
 @client.command()
 async def bal(ctx):
     currencySymbol=servers[str(ctx.guild.id)]['currencySymbol']
@@ -75,9 +78,16 @@ async def work(ctx):
 
 @client.command()
 async def pay(ctx, target: discord.Member, amount):
-    amount=int(amount)
+    try:
+        amount=int(amount)
+    except ValueError:
+        await ctx.send("That is not a number")
+        return
     if amount <=0:
-        ctx.send("You cannot pay someone a negative or zero value")
+        await ctx.send("You cannot pay someone a negative or zero value")
+        return
+    if amount > getUserCashBalance(ctx.message.author, ctx.message.guild):
+        await ctx.send("You do not have enough cash")
         return
     modifyUserBalance(ctx.message.author, ctx.message.guild, -1*amount)
     modifyUserBalance(target, ctx.message.guild, amount)
@@ -138,12 +148,15 @@ async def bj(ctx, money="failure"):
     if money=="failure": #checks if they are betting money
         await ctx.send("Proper usage: `!bj <bet amount>`")
         return
-    if float(money)<=0 or float(money)-math.trunc(float(money))!=0: #checks to see if there is a decimal
+    money=float(money)
+    if money<=0 or money-math.trunc(money)!=0: #checks to see if there is a decimal
         await ctx.send("Bet amount must be a non-zero positive integer")
         return
     if ctx.author in activeUsers:
         await ctx.send("You already have a game!")
         return
+    money=int(money)
+    modifyUserBalance(ctx.message.author, ctx.message.guild, -1*money)
     activeUsers.append(ctx.author)
     playerHand=[]
     dealerHand=[]
@@ -194,24 +207,15 @@ async def bj(ctx, money="failure"):
     if playerScore > 21: #if player busts
         dealerScore, dealerString = updateStats(dealerHand) #dealer flips card
         result = "BUST" #sets result msg to bust
-        await updateBJEmbed(thisMessage,ctx,playerString, dealerString, playerScore, dealerScore, result, discord.Color.red()) #updates text
 
     else:
         dealerScore, dealerString = updateStats(dealerHand)
         if playerScore==21 and dealerScore==21 and moveCounterPlayer==0 and moveCounterDealer==0:
             result = "TIE"
-            await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
-                                discord.Color.blue())
-
         if playerScore==21 and moveCounterPlayer==0 and (dealerScore<21 or moveCounterDealer>0):
             result="BLACKJACK"
-            await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
-                                discord.Color.green())
-
         if dealerScore==21 and moveCounterDealer==0 and (playerScore<21 or moveCounterPlayer>0):
             result = "LOSS"
-            await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
-                                discord.Color.red())
 
         while (dealerScore < playerScore and dealerScore < 21): #Dealer Hit, DO NOT EXCLUDE IF NOT BLACKJACK
             dealerHand.append(deck.getRandomCard())
@@ -221,25 +225,36 @@ async def bj(ctx, money="failure"):
         if not result=="BLACKJACK" and not result =="LOSS":
             if dealerScore>21:
                 result="WIN"
-                await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
-                                    discord.Color.green())
-
             elif (playerScore == dealerScore):
                 result="TIE"
-                await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
-                                    discord.Color.blue())
             elif (playerScore > dealerScore):
                 result="WIN"
-                await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
-                                    discord.Color.green())
-
             elif (playerScore < dealerScore):
                 result="LOSS"
-                await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, result,
-                                    discord.Color.red())
+
     i=activeUsers.index(ctx.author) #finds player pos after game
     activeUsers.pop(i) #removes player after game ends based on pos
-
+    if result == "BLACKJACK":
+        winnings=money*2.5
+        resultString = "Blackjack: +" + getCurrencySymbol(ctx) + str(money*1.5)
+        await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
+                            discord.Color.green())
+    elif result == "WIN":
+        winnings=money*2
+        resultString = "Win: +"  + getCurrencySymbol(ctx) + str(money)
+        await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
+                            discord.Color.green())
+    elif result == "TIE":
+        winnings=money
+        resultString = "Tie: +" + getCurrencySymbol(ctx) + str(0)
+        await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
+                            discord.Color.blue())
+    elif result=="BUST" or result=="LOSS":
+        winnings=0
+        resultString="Loss: -" + getCurrencySymbol(ctx) + str(money)
+        await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
+                            discord.Color.red())
+    modifyUserBalance(ctx.author, ctx.guild, int(winnings))
 
 
 
