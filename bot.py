@@ -47,6 +47,7 @@ def getUserBankBalance(user, guild):
     return servers[str(guild.id)]["users"][str(user.id)]["bank"]
 
 
+
 @client.command()
 async def dumpJson(ctx):
     f = open("serverdata.json",'w')
@@ -75,6 +76,7 @@ async def work(ctx):
     amount = random.randint(50,200)
     modifyUserBalance(ctx.message.author, ctx.message.guild, amount)
     await ctx.send("You have made "+servers[str(ctx.message.guild.id)]["currencySymbol"]+str(amount))
+
 
 @client.command()
 async def pay(ctx, target: discord.Member, amount):
@@ -128,6 +130,7 @@ async def updateBJEmbed(messageID, ctx, playerString, dealerString, playerScore,
     newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
     # newembed.add_field(name="|", value="|")
     newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
+    newembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/320338902747709452/699127157729001532/Chip.png")
     await messageID.edit(embed=newembed)
 
 
@@ -170,6 +173,7 @@ async def bj(ctx, money="failure"):
 
     playerScore, playerString = updateStats(playerHand) #calculates score and makes it printable
     embed = discord.Embed(title="Blackjack: "+ str(ctx.author)) #prints game to chat
+    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/320338902747709452/699127157729001532/Chip.png")
 
     dealerString=str(dealerHand[0]) #only shows the first card in dealers hand
     for i in range(len(dealerHand)-1):
@@ -196,6 +200,7 @@ async def bj(ctx, money="failure"):
                 newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
                 #newembed.add_field(name="|", value="|")
                 newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
+                newembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/320338902747709452/699127157729001532/Chip.png")
                 await thisMessage.edit(embed=newembed)
                 invalid = False
                 moveCounterPlayer+=1
