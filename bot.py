@@ -152,13 +152,13 @@ async def bj(ctx, money="failure"):
         await ctx.send("Proper usage: `!bj <bet amount>`")
         return
     money=float(money)
-    if money<=0 or money-math.trunc(money)!=0: #checks to see if there is a decimal
-        await ctx.send("Bet amount must be a non-zero positive integer")
+    if money<100 or money-math.trunc(money)!=0: #checks to see if there is a decimal
+        await ctx.send("Bet amount must be an integer above 100")
         return
     if ctx.author in activeUsers:
         await ctx.send("You already have a game!")
         return
-    if getUserCashBalance(ctx.author, ctx.guild)>money:
+    if getUserCashBalance(ctx.author, ctx.guild)<money:
         await ctx.send("You do not have that much money")
         return
     money=int(money)
