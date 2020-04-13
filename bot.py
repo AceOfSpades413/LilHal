@@ -29,7 +29,6 @@ def initUserEconomy(user, guild):
         "money":0,
         "bank":0,
         "workCooldown":0
-
     }
 
 def modifyUserBalance(user, guild, amount):
@@ -55,15 +54,15 @@ async def dumpJson(ctx):
     f.close()
 
 @client.command()
-async def printServers(ctx):
-    await ctx.send(servers)
+async def setCurrencySymbol(ctx, symbol):
+    servers[str(ctx.message.guild.id)]["currencySymbol"]=str(symbol)
 
 @client.command()
 async def bal(ctx):
     currencySymbol=servers[str(ctx.guild.id)]['currencySymbol']
     cash=getUserCashBalance(ctx.message.author, ctx.message.guild)
     bank=getUserBankBalance(ctx.message.author, ctx.message.guild)
-    embed=discord.Embed(title='@'+str(ctx.message.author)+" 's Balance")
+    embed=discord.Embed(title=str(ctx.message.author)+"'s Balance")
     embed.add_field(name='Cash', value=currencySymbol + str(cash))
     embed.add_field(name='Bank', value=currencySymbol + str(bank))
     await ctx.send(embed=embed)
@@ -72,7 +71,7 @@ async def bal(ctx):
 async def work(ctx):
     amount = random.randint(50,200)
     modifyUserBalance(ctx.message.author, ctx.message.guild, amount)
-    await ctx.send("You have made $"+str(amount))
+    await ctx.send("You have made "+servers[str(ctx.message.guild.id)]["currencySymbol"]+str(amount))
 
 @client.command()
 async def pay(ctx, target: discord.Member, amount):
