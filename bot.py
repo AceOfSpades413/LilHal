@@ -3,6 +3,7 @@ from discord.ext import commands
 import random
 from classes.CardgameUtils import Card, Deck
 import math
+import json
 
 client = commands.Bot(command_prefix='!')
 client.remove_command('help')
@@ -10,6 +11,62 @@ client.remove_command('help')
 tFile = open("token.txt", "r")
 TOKEN = tFile.readline().strip("\n")
 activeUsers=[]
+
+servers={}
+
+@client.event
+async def on_guild_join(guild):
+    if str(guild.id) not in servers:
+        servers[str(guild.id)]={
+            "users":{},
+            "currencySymbol":'$'
+        }
+
+def initUserEconomy(user, guild):
+    servers[str(guild.id)]["users"][str(user.id)]={
+        "money":0,
+        "bank":0
+    }
+
+def modifyUserBalance(user, guild, amount):
+    if str(user.id) not in servers[str(guild.id)]["users"]:
+        initUserEconomy(user,guild)
+    servers[str(guild.id)]["users"][str(user.id)]["money"]+=amount
+
+def getUserBalance(user, guild):
+    if str(user.id) not in servers[str(guild.id)]["users"]:
+        initUserEconomy(user,guild)
+    return servers[str(guild.id)]["users"][str(user.id)]["money"]
+
+@client.command()
+async def dumpJson(ctx):
+    f = open("serverdata.json",'w')
+    f.write(json.dumps(servers))
+    f.close()
+
+@client.command()
+async def printServers(ctx):
+    await ctx.send(servers)
+
+@client.command()
+async def bal(ctx):
+    await ctx.send(getUserBalance(ctx.message.author, ctx.message.guild))
+
+@client.command()
+async def work(ctx):
+    amount = random.randint(50,200)
+    modifyUserBalance(ctx.message.author, ctx.message.guild, amount)
+    await ctx.send("You have made $"+str(amount))
+
+@client.command()
+async def pay(ctx, target: discord.Member, amount):
+    amount=int(amount)
+    if amount <=0:
+        ctx.send("You cannot pay someone a negative or zero value")
+        return
+    modifyUserBalance(ctx.message.author, ctx.message.guild, -1*amount)
+    modifyUserBalance(target, ctx.message.guild, amount)
+
 
 
 def calcScore(cards):
@@ -54,6 +111,11 @@ async def updateBJEmbed(messageID, ctx, playerString, dealerString, playerScore,
 async def on_ready():
     print("Bot Online!")
     await client.change_presence(activity=discord.Game(name="at the virtual casino"))
+    f=open("serverdata.json",'r')
+    datastring=f.readline().strip('\n')
+    global servers
+    servers=json.loads(datastring)
+    print(datastring)
 
 
 @client.command()
