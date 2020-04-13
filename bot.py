@@ -5,7 +5,7 @@ from classes.CardgameUtils import Card, Deck
 import math
 import json
 
-client = commands.Bot(command_prefix='!')
+client = commands.Bot(command_prefix='!', case_insensitive=True)
 client.remove_command('help')
 
 tFile = open("token.txt", "r")
