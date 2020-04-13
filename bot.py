@@ -19,13 +19,17 @@ async def on_guild_join(guild):
     if str(guild.id) not in servers:
         servers[str(guild.id)]={
             "users":{},
-            "currencySymbol":'$'
+            "roles":{},
+            "currencySymbol":'$',
+            "serverWorkCooldown":120
         }
 
 def initUserEconomy(user, guild):
     servers[str(guild.id)]["users"][str(user.id)]={
         "money":0,
-        "bank":0
+        "bank":0,
+        "workCooldown":0
+
     }
 
 def modifyUserBalance(user, guild, amount):
@@ -33,10 +37,16 @@ def modifyUserBalance(user, guild, amount):
         initUserEconomy(user,guild)
     servers[str(guild.id)]["users"][str(user.id)]["money"]+=amount
 
-def getUserBalance(user, guild):
+def getUserCashBalance(user, guild):
     if str(user.id) not in servers[str(guild.id)]["users"]:
         initUserEconomy(user,guild)
     return servers[str(guild.id)]["users"][str(user.id)]["money"]
+
+def getUserBankBalance(user, guild):
+    if str(user.id) not in servers[str(guild.id)]["users"]:
+        initUserEconomy(user,guild)
+    return servers[str(guild.id)]["users"][str(user.id)]["bank"]
+
 
 @client.command()
 async def dumpJson(ctx):
@@ -50,7 +60,13 @@ async def printServers(ctx):
 
 @client.command()
 async def bal(ctx):
-    await ctx.send(getUserBalance(ctx.message.author, ctx.message.guild))
+    currencySymbol=servers[str(ctx.guild.id)]['currencySymbol']
+    cash=getUserCashBalance(ctx.message.author, ctx.message.guild)
+    bank=getUserBankBalance(ctx.message.author, ctx.message.guild)
+    embed=discord.Embed(title='@'+str(ctx.message.author)+" 's Balance")
+    embed.add_field(name='Cash', value=currencySymbol + str(cash))
+    embed.add_field(name='Bank', value=currencySymbol + str(bank))
+    await ctx.send(embed=embed)
 
 @client.command()
 async def work(ctx):
