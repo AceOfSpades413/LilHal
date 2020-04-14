@@ -31,10 +31,15 @@ def initUserEconomy(user, guild):
         "workCooldown":0
     }
 
-def modifyUserBalance(user, guild, amount):
+def modifyUserCashBalance(user, guild, amount):
     if str(user.id) not in servers[str(guild.id)]["users"]:
         initUserEconomy(user,guild)
     servers[str(guild.id)]["users"][str(user.id)]["money"]+=amount
+
+def modifyUserBankBalance(user, guild, amount):
+    if str(user.id) not in servers[str(guild.id)]["users"]:
+        initUserEconomy(user,guild)
+    servers[str(guild.id)]["users"][str(user.id)]["bank"]+=amount
 
 def getUserCashBalance(user, guild):
     if str(user.id) not in servers[str(guild.id)]["users"]:
@@ -88,7 +93,7 @@ async def bal(ctx, *args):
 @client.command()
 async def work(ctx):
     amount = random.randint(50,200)
-    modifyUserBalance(ctx.message.author, ctx.message.guild, amount)
+    modifyUserCashBalance(ctx.message.author, ctx.message.guild, amount)
     await ctx.send("You have made "+servers[str(ctx.message.guild.id)]["currencySymbol"]+str(amount))
 
 
@@ -105,8 +110,8 @@ async def pay(ctx, target: discord.Member, amount):
     if amount > getUserCashBalance(ctx.message.author, ctx.message.guild):
         await ctx.send("You do not have enough cash")
         return
-    modifyUserBalance(ctx.message.author, ctx.message.guild, -1*amount)
-    modifyUserBalance(target, ctx.message.guild, amount)
+    modifyUserCashBalance(ctx.message.author, ctx.message.guild, -1*amount)
+    modifyUserCashBalance(target, ctx.message.guild, amount)
 
 @client.command()
 async def rob(ctx, target: discord.Member):
@@ -114,15 +119,45 @@ async def rob(ctx, target: discord.Member):
     success = random.randint(0, 3)
     if success <= 2:
         transfer = (((random.randint(6, 9))/10)*targetBalance).__round__()
-        modifyUserBalance(target, ctx.message.guild, -transfer)
-        modifyUserBalance(ctx.message.author, ctx.message.guild, transfer)
+        modifyUserCashBalance(target, ctx.message.guild, -transfer)
+        modifyUserCashBalance(ctx.message.author, ctx.message.guild, transfer)
         await ctx.send("you robbed "+ str(target)+ " for "+ getCurrencySymbol(ctx)+str(transfer))
     elif success >= 3:
 
         await ctx.send("you failed to rob and lost")
     return
 
+@client.command()
+async def dep(ctx, amount):
+    if amount == ("all").lower():
+        transfer = getUserCashBalance(ctx.author, ctx.guild)
+    else:
+        transfer = int(amount)
+    balance = getUserCashBalance(ctx.author, ctx.guild)
+    if balance >= transfer and transfer > 0:
+        modifyUserCashBalance(ctx.author, ctx.guild, -transfer)
+        modifyUserBankBalance(ctx.author, ctx.guild, transfer)
+    elif balance < transfer:
+        await ctx.send("you don't have enough money in your bank account to do that")
+    else:
+        await ctx.send("you can't deposit negative or zero amounts")
+    return
 
+@client.command()
+async def withdraw(ctx, amount):
+    if amount == ("all").lower():
+        transfer = getUserBankBalance(ctx.author, ctx.guild)
+    else:
+        transfer = int(amount)
+    balance = getUserBankBalance(ctx.author, ctx.guild)
+    if balance >= transfer and transfer > 0:
+        modifyUserBankBalance(ctx.author, ctx.guild, -transfer)
+        modifyUserCashBalance(ctx.author, ctx.guild, transfer)
+    elif balance < transfer:
+        await ctx.send("you don't have enough money in your bank account to do that")
+    else:
+        await ctx.send("you can't withdraw negative or zero amounts")
+    return
 
 
 
@@ -192,7 +227,7 @@ async def bj(ctx, money="failure"):
         await ctx.send("You do not have that much money")
         return
     money=int(money)
-    modifyUserBalance(ctx.message.author, ctx.message.guild, -1*money)
+    modifyUserCashBalance(ctx.message.author, ctx.message.guild, -1*money)
     activeUsers.append(ctx.author)
     playerHand=[]
     dealerHand=[]
@@ -292,7 +327,7 @@ async def bj(ctx, money="failure"):
         resultString="Loss: -" + getCurrencySymbol(ctx) + str(money)
         await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
                             discord.Color.red())
-    modifyUserBalance(ctx.author, ctx.guild, int(winnings))
+    modifyUserCashBalance(ctx.author, ctx.guild, int(winnings))
 
 
 
