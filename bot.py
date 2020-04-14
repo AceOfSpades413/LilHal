@@ -62,18 +62,20 @@ def getCurrencySymbol(ctx):
     return servers[str(ctx.message.guild.id)]["currencySymbol"]
 
 @client.command()
-async def bal(ctx):
-    currencySymbol = servers[str(ctx.guild.id)]['currencySymbol']
-    cash = getUserCashBalance(ctx.message.author, ctx.message.guild)
-    bank = getUserBankBalance(ctx.message.author, ctx.message.guild)
-    embed = discord.Embed(title=str(ctx.message.author) + "'s Balance")
-    embed.add_field(name='Cash', value=currencySymbol + str(cash))
-    embed.add_field(name='Bank', value=currencySymbol + str(bank))
-    await ctx.send(embed=embed)
-    return
-
-@client.command()
-async def bal(ctx, target: discord.Member):
+async def bal(ctx, *args):
+    target=""
+    if len(args)==0:
+        target=ctx.author
+    elif len(args)==1:
+        mc=discord.ext.commands.MemberConverter()
+        try:
+            target=await mc.convert(ctx, args[0])
+        except:
+            await ctx.send("user not found!")
+            return
+    else:
+        await ctx.send("Improper command usage!")
+        return
     currencySymbol = servers[str(ctx.guild.id)]['currencySymbol']
     cash = getUserCashBalance(target, ctx.message.guild)
     bank = getUserBankBalance(target, ctx.message.guild)
