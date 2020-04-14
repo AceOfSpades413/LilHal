@@ -63,13 +63,25 @@ def getCurrencySymbol(ctx):
 
 @client.command()
 async def bal(ctx):
-    currencySymbol=servers[str(ctx.guild.id)]['currencySymbol']
-    cash=getUserCashBalance(ctx.message.author, ctx.message.guild)
-    bank=getUserBankBalance(ctx.message.author, ctx.message.guild)
-    embed=discord.Embed(title=str(ctx.message.author)+"'s Balance")
+    currencySymbol = servers[str(ctx.guild.id)]['currencySymbol']
+    cash = getUserCashBalance(ctx.message.author, ctx.message.guild)
+    bank = getUserBankBalance(ctx.message.author, ctx.message.guild)
+    embed = discord.Embed(title=str(ctx.message.author) + "'s Balance")
     embed.add_field(name='Cash', value=currencySymbol + str(cash))
     embed.add_field(name='Bank', value=currencySymbol + str(bank))
     await ctx.send(embed=embed)
+    return
+
+@client.command()
+async def bal(ctx, target: discord.Member):
+    currencySymbol = servers[str(ctx.guild.id)]['currencySymbol']
+    cash = getUserCashBalance(target, ctx.message.guild)
+    bank = getUserBankBalance(target, ctx.message.guild)
+    embed = discord.Embed(title=str(target) + "'s Balance")
+    embed.add_field(name='Cash', value=currencySymbol + str(cash))
+    embed.add_field(name='Bank', value=currencySymbol + str(bank))
+    await ctx.send(embed=embed)
+    return
 
 @client.command()
 async def work(ctx):
@@ -93,6 +105,22 @@ async def pay(ctx, target: discord.Member, amount):
         return
     modifyUserBalance(ctx.message.author, ctx.message.guild, -1*amount)
     modifyUserBalance(target, ctx.message.guild, amount)
+
+@client.command()
+async def rob(ctx, target: discord.Member):
+    targetBalance=getUserCashBalance(target, ctx.message.guild)
+    success = random.randint(0, 3)
+    if success <= 2:
+        transfer = (((random.randint(6, 9))/10)*targetBalance).__round__()
+        modifyUserBalance(target, ctx.message.guild, -transfer)
+        modifyUserBalance(ctx.message.author, ctx.message.guild, transfer)
+        await ctx.send("you robbed "+ str(target)+ " for "+ getCurrencySymbol(ctx)+str(transfer))
+    elif success >= 3:
+
+        await ctx.send("you failed to rob and lost")
+    return
+
+
 
 
 
