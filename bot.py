@@ -143,7 +143,7 @@ async def dep(ctx, amount):
         await ctx.send("you can't deposit negative or zero amounts")
     return
 
-@client.command()
+@client.command(aliases=['with'])
 async def withdraw(ctx, amount):
     if amount == ("all").lower():
         transfer = getUserBankBalance(ctx.author, ctx.guild)
