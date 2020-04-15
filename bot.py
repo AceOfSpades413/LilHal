@@ -96,7 +96,6 @@ async def work(ctx):
     modifyUserCashBalance(ctx.message.author, ctx.message.guild, amount)
     await ctx.send("You have made "+servers[str(ctx.message.guild.id)]["currencySymbol"]+str(amount))
 
-
 @client.command()
 async def pay(ctx, target: discord.Member, amount):
     try:
@@ -159,7 +158,16 @@ async def withdraw(ctx, amount):
         await ctx.send("you can't withdraw negative or zero amounts")
     return
 
-
+@client.command()
+async def lb(ctx):
+    count = 0
+    a=[]
+    for userid in servers[str(ctx.guild.id)]["users"]:
+        mc = discord.ext.commands.MemberConverter()
+        username=await mc.convert(ctx, userid)
+        amount = getUserCashBalance(username, ctx.guild) + getUserBankBalance(username, ctx.guild)
+        symbol = getCurrencySymbol(ctx)
+        await ctx.send (str(username) + " has " + str(symbol) + str(amount))
 
 def calcScore(cards):
     score = 0 #defines score as 0 to be recalculated
