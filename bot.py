@@ -160,14 +160,25 @@ async def withdraw(ctx, amount):
 
 @client.command()
 async def lb(ctx):
-    count = 0
-    a=[]
+    lists = []
     for userid in servers[str(ctx.guild.id)]["users"]:
         mc = discord.ext.commands.MemberConverter()
         username=await mc.convert(ctx, userid)
         amount = getUserCashBalance(username, ctx.guild) + getUserBankBalance(username, ctx.guild)
         symbol = getCurrencySymbol(ctx)
-        await ctx.send (str(username) + " has " + str(symbol) + str(amount))
+        lists.append([amount, username.name])
+        #await ctx.send(str(username) + " has " + str(symbol) + str(amount))
+    print(lists)
+    count = 0
+    lists.sort()
+    lists.reverse()
+    print(lists)
+    print(len(lists))
+    symbol = getCurrencySymbol(ctx)
+    while count < len(lists):
+        await ctx.send("#"+str(count+1) + " " + str(lists[count][1]) + " - " + symbol + str(lists[count][0]))
+        count+=1
+    return
 
 def calcScore(cards):
     score = 0 #defines score as 0 to be recalculated
@@ -216,7 +227,7 @@ async def on_ready():
     datastring=f.readline().strip('\n')
     global servers
     servers=json.loads(datastring)
-    print(datastring)
+    print(datastring, "\n")
 
 
 @client.command()
