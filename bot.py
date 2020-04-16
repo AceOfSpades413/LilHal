@@ -158,7 +158,7 @@ async def withdraw(ctx, amount):
         await ctx.send("you can't withdraw negative or zero amounts")
     return
 
-@client.command()
+@client.command(aliases=['leaderboard', 'leaders'])
 async def lb(ctx):
     lists = []
     for userid in servers[str(ctx.guild.id)]["users"]:
@@ -168,17 +168,17 @@ async def lb(ctx):
         symbol = getCurrencySymbol(ctx)
         lists.append([amount, username.name])
         #await ctx.send(str(username) + " has " + str(symbol) + str(amount))
-    print(lists)
     count = 0
     lists.sort()
     lists.reverse()
-    print(lists)
-    print(len(lists))
     symbol = getCurrencySymbol(ctx)
+    embed=discord.Embed(title="Leaderboards")
+    leaderString=""
     while count < len(lists):
-        await ctx.send("#"+str(count+1) + " " + str(lists[count][1]) + " - " + symbol + str(lists[count][0]))
+        leaderString+="#"+str(count+1) + " " + str(lists[count][1]) + " - " + symbol + str(lists[count][0])+"\n"
         count+=1
-    return
+    embed.add_field(name="Leaders", value=leaderString)
+    await ctx.send(embed=embed)
 
 def calcScore(cards):
     score = 0 #defines score as 0 to be recalculated
