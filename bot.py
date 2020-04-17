@@ -14,15 +14,6 @@ activeUsers=[]
 
 servers={}
 
-@client.event
-async def on_guild_join(guild):
-    if str(guild.id) not in servers:
-        servers[str(guild.id)]={
-            "users":{},
-            "roles":{},
-            "currencySymbol":'$',
-            "serverWorkCooldown":120
-        }
 
 def initUserEconomy(user, guild):
     servers[str(guild.id)]["users"][str(user.id)]={
@@ -51,6 +42,89 @@ def getUserBankBalance(user, guild):
         initUserEconomy(user,guild)
     return servers[str(guild.id)]["users"][str(user.id)]["bank"]
 
+def getCurrencySymbol(ctx):
+    return servers[str(ctx.message.guild.id)]["currencySymbol"]
+
+async def updateBJEmbed(messageID, ctx, playerString, dealerString, playerScore, dealerScore, result, color):
+    if result=="":
+        desc=""
+    else:
+        desc="Result: "+result
+    newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description=desc, color=color)
+    newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
+    # newembed.add_field(name="|", value="|")
+    newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
+    newembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/320338902747709452/699127157729001532/Chip.png")
+    await messageID.edit(embed=newembed)
+
+def updateStats(Hand):
+    score = calcScore(Hand) #calculates the score of what the user has
+    String="" #resets the players string
+    for card in Hand: #adds cards based on how many cards the player has
+        String+=str(card) + " " #sets the players hand as the cards it has with spaces in between
+    return score, String #returns players score and the list of cards it has
+
+def calcScore(cards):
+    score = 0 #defines score as 0 to be recalculated
+    cardValueList=[] #
+    for card in cards: #
+        cardValueList.append(card.getNumberValue())
+    cardValueList.sort() #makes sure that aces are at the end of the calculation
+    for val in cardValueList:
+        if val<=10: #checks to see if card is a 2-10
+            score+=val #adds the card number to the score
+        elif val <=13: #checks to see if card is a J,Q, or K
+            score+=10 #adds 10 to the score
+        else: #realizes that card is an A
+            if score+11>21: #checks to see if ace should be a 1 or an 11
+                score+=1
+            else:
+                score+=11
+    return score
+
+
+
+
+@client.event
+async def on_ready():
+    print("Bot Online!")
+    await client.change_presence(activity=discord.Game(name="at the virtual casino"))
+    f=open("serverdata.json",'r')
+    datastring=f.readline().strip('\n')
+    global servers
+    servers=json.loads(datastring)
+    print(datastring, "\n")
+
+@client.event
+async def on_guild_join(guild):
+    if str(guild.id) not in servers:
+        servers[str(guild.id)]={
+            "users":{},
+            "roles":{},
+            "currencySymbol":'$',
+            "serverWorkCooldown":120
+        }
+
+
+
+
+
+
+@client.command()
+async def shop(ctx, *page):
+    #code
+
+@client.command()
+async def buy(ctx):
+    #code
+
+@client.command()
+async def sell(ctx): #needs to be discussed for
+    #code
+
+
+
+
 
 
 @client.command()
@@ -62,9 +136,6 @@ async def dumpJson(ctx):
 @client.command()
 async def setCurrencySymbol(ctx, symbol):
     servers[str(ctx.message.guild.id)]["currencySymbol"]=str(symbol)
-
-def getCurrencySymbol(ctx):
-    return servers[str(ctx.message.guild.id)]["currencySymbol"]
 
 @client.command()
 async def bal(ctx, *args):
@@ -165,7 +236,6 @@ async def lb(ctx):
         mc = discord.ext.commands.MemberConverter()
         username=await mc.convert(ctx, userid)
         amount = getUserCashBalance(username, ctx.guild) + getUserBankBalance(username, ctx.guild)
-        symbol = getCurrencySymbol(ctx)
         lists.append([amount, username.name])
         #await ctx.send(str(username) + " has " + str(symbol) + str(amount))
     count = 0
@@ -179,56 +249,6 @@ async def lb(ctx):
         count+=1
     embed.add_field(name="Leaders", value=leaderString)
     await ctx.send(embed=embed)
-
-def calcScore(cards):
-    score = 0 #defines score as 0 to be recalculated
-    cardValueList=[] #
-    for card in cards: #
-        cardValueList.append(card.getNumberValue())
-    cardValueList.sort() #makes sure that aces are at the end of the calculation
-    for val in cardValueList:
-        if val<=10: #checks to see if card is a 2-10
-            score+=val #adds the card number to the score
-        elif val <=13: #checks to see if card is a J,Q, or K
-            score+=10 #adds 10 to the score
-        else: #realizes that card is an A
-            if score+11>21: #checks to see if ace should be a 1 or an 11
-                score+=1
-            else:
-                score+=11
-    return score
-
-def updateStats(Hand):
-    score = calcScore(Hand) #calculates the score of what the user has
-    String="" #resets the players string
-    for card in Hand: #adds cards based on how many cards the player has
-        String+=str(card) + " " #sets the players hand as the cards it has with spaces in between
-    return score, String #returns players score and the list of cards it has
-
-async def updateBJEmbed(messageID, ctx, playerString, dealerString, playerScore, dealerScore, result, color):
-    if result=="":
-        desc=""
-    else:
-        desc="Result: "+result
-    newembed = discord.Embed(title="Blackjack: " + str(ctx.author), description=desc, color=color)
-    newembed.add_field(name="Player Hand", value=playerString + "\n\n" + "Your score: " + str(playerScore))
-    # newembed.add_field(name="|", value="|")
-    newembed.add_field(name="Dealer Hand", value=dealerString + "\n\n" + "Dealer's Score: " + str(dealerScore))
-    newembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/320338902747709452/699127157729001532/Chip.png")
-    await messageID.edit(embed=newembed)
-
-
-
-@client.event
-async def on_ready():
-    print("Bot Online!")
-    await client.change_presence(activity=discord.Game(name="at the virtual casino"))
-    f=open("serverdata.json",'r')
-    datastring=f.readline().strip('\n')
-    global servers
-    servers=json.loads(datastring)
-    print(datastring, "\n")
-
 
 @client.command()
 async def bj(ctx, money="failure"):
