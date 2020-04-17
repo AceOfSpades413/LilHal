@@ -117,7 +117,8 @@ async def on_guild_join(guild):
             "users":{},
             "roles":{},
             "currencySymbol":'$',
-            "serverWorkCooldown":120
+            "serverWorkCooldown":120,
+            "serverRobCooldown":180
         }
 
 @client.event
@@ -158,6 +159,8 @@ async def timeUpdates():
             #start operating on each value per user per server
             if(userdata["workCooldown"]>0):
                 userdata["workCooldown"]-=1
+            if(userdata["robCooldown"])>0:
+                userdata["robCooldown"]-=1
 
 
 @client.command()
@@ -243,15 +246,20 @@ async def pay(ctx, target: discord.Member, amount):
 async def rob(ctx, target: discord.Member):
     targetBalance=getUserCashBalance(target, ctx.message.guild)
     success = random.randint(0, 3)
-    if success <= 2:
-        transfer = (((random.randint(6, 9))/10)*targetBalance).__round__()
-        modifyUserCashBalance(target, ctx.message.guild, -transfer)
-        modifyUserCashBalance(ctx.message.author, ctx.message.guild, transfer)
-        await ctx.send("you robbed "+ str(target)+ " for "+ getCurrencySymbol(ctx.guild)+str(transfer))
-    elif success >= 3:
+    cooldown = getUserKey(ctx.author, ctx.guild, 'robCooldown')
+    if cooldown <= 0:
+        if success <= 2:
+            transfer = (((random.randint(6, 9)) / 10) * targetBalance).__round__()
+            modifyUserCashBalance(target, ctx.message.guild, -transfer)
+            modifyUserCashBalance(ctx.message.author, ctx.message.guild, transfer)
+            await ctx.send("you robbed " + str(target) + " for " + getCurrencySymbol(ctx.guild) + str(transfer))
+        elif success >= 3:
 
-        await ctx.send("you failed to rob and lost")
-    return
+            await ctx.send("you failed to rob and lost")
+        setUserKey(ctx.author, ctx.guild, 'robCooldown', getServerKey(ctx.guild, 'serverRobCooldown'))
+    else:
+        await ctx.send(f"You must wait {cooldown} seconds")
+
 
 @client.command()
 async def dep(ctx, amount):
