@@ -42,8 +42,8 @@ def getUserBankBalance(user, guild):
         initUserEconomy(user,guild)
     return servers[str(guild.id)]["users"][str(user.id)]["bank"]
 
-def getCurrencySymbol(ctx):
-    return servers[str(ctx.message.guild.id)]["currencySymbol"]
+def getCurrencySymbol(guild):
+    return servers[str(guild.id)]["currencySymbol"]
 
 async def updateBJEmbed(messageID, ctx, playerString, dealerString, playerScore, dealerScore, result, color):
     if result=="":
@@ -192,7 +192,7 @@ async def rob(ctx, target: discord.Member):
         transfer = (((random.randint(6, 9))/10)*targetBalance).__round__()
         modifyUserCashBalance(target, ctx.message.guild, -transfer)
         modifyUserCashBalance(ctx.message.author, ctx.message.guild, transfer)
-        await ctx.send("you robbed "+ str(target)+ " for "+ getCurrencySymbol(ctx)+str(transfer))
+        await ctx.send("you robbed "+ str(target)+ " for "+ getCurrencySymbol(ctx.guild)+str(transfer))
     elif success >= 3:
 
         await ctx.send("you failed to rob and lost")
@@ -242,7 +242,7 @@ async def lb(ctx):
     count = 0
     lists.sort()
     lists.reverse()
-    symbol = getCurrencySymbol(ctx)
+    symbol = getCurrencySymbol(ctx.guild)
     embed=discord.Embed(title="Leaderboards")
     leaderString=""
     while count < len(lists):
@@ -349,22 +349,22 @@ async def bj(ctx, money="failure"):
     activeUsers.pop(i) #removes player after game ends based on pos
     if result == "BLACKJACK":
         winnings=money*2.5
-        resultString = "Blackjack: +" + getCurrencySymbol(ctx) + str(int(money*1.5))
+        resultString = "Blackjack: +" + getCurrencySymbol(ctx.guild) + str(int(money*1.5))
         await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
                             discord.Color.green())
     elif result == "WIN":
         winnings=money*2
-        resultString = "Win: +"  + getCurrencySymbol(ctx) + str(money)
+        resultString = "Win: +"  + getCurrencySymbol(ctx.guild) + str(money)
         await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
                             discord.Color.green())
     elif result == "TIE":
         winnings=money
-        resultString = "Tie: +" + getCurrencySymbol(ctx) + str(0)
+        resultString = "Tie: +" + getCurrencySymbol(ctx.guild) + str(0)
         await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
                             discord.Color.blue())
     elif result=="BUST" or result=="LOSS":
         winnings=0
-        resultString="Loss: -" + getCurrencySymbol(ctx) + str(money)
+        resultString="Loss: -" + getCurrencySymbol(ctx.guild) + str(money)
         await updateBJEmbed(thisMessage, ctx, playerString, dealerString, playerScore, dealerScore, resultString,
                             discord.Color.red())
     modifyUserCashBalance(ctx.author, ctx.guild, int(winnings))
