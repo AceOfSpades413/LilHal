@@ -15,6 +15,18 @@ activeUsers=[]
 servers={}
 
 
+def setUserKey(user, guild, key, value):
+    servers[str(guild.id)]["users"][str(user.id)][key]=value
+
+def getUserKey(user, guild, key):
+    return servers[str(guild.id)]["users"][str(user.id)][key]
+
+def getServerKey(guild, key):
+    return servers[str(guild.id)][key]
+
+def setServerKey(guild, key, value):
+    servers[str(guild.id)][key]=value
+
 def initUserEconomy(user, guild):
     servers[str(guild.id)]["users"][str(user.id)]={
         "money":0,
@@ -95,6 +107,7 @@ async def on_ready():
     servers=json.loads(datastring)
     print(datastring, "\n")
     dumpJson.start()
+    timeUpdates.start()
 
 @client.event
 async def on_guild_join(guild):
@@ -134,9 +147,40 @@ async def dumpJson():
     f.write(json.dumps(servers))
     f.close()
 
+@tasks.loop(seconds=1.0)
+async def timeUpdates():
+    for serverid, serverdata in servers.items():
+        for userid, userdata in serverdata['users'].items():
+            #start operating on each value per user per server
+            if(userdata["workCooldown"]>0):
+                userdata["workCooldown"]-=1
+
+
 @client.command()
 async def setCurrencySymbol(ctx, symbol):
     servers[str(ctx.message.guild.id)]["currencySymbol"]=str(symbol)
+
+@client.command()
+async def userinfo(ctx, *args):
+    target = ""
+    if len(args) == 0:
+        target = ctx.author
+    elif len(args) == 1:
+        mc = discord.ext.commands.MemberConverter()
+        try:
+            target = await mc.convert(ctx, args[0])
+        except:
+            await ctx.send("user not found!")
+            return
+    else:
+        await ctx.send("Improper command usage!")
+        return
+    embed=discord.Embed(title=str(target))
+    embed.set_thumbnail(url=str(target.avatar_url))
+    embed.add_field(name="Member of this server since:", value=target.joined_at)
+    embed.add_field(name="Net worth: ", value=getCurrencySymbol(ctx.guild)+' '+str(getUserCashBalance(target, ctx.guild)+getUserBankBalance(target, ctx.guild)))
+    embed.add_field(name="Work Cooldown:", value = getUserKey(ctx.author, ctx.guild, 'workCooldown'))
+    await ctx.send(embed=embed)
 
 @client.command()
 async def bal(ctx, *args):
@@ -162,11 +206,18 @@ async def bal(ctx, *args):
     await ctx.send(embed=embed)
     return
 
+
+
 @client.command()
 async def work(ctx):
-    amount = random.randint(50,200)
-    modifyUserCashBalance(ctx.message.author, ctx.message.guild, amount)
-    await ctx.send("You have made "+servers[str(ctx.message.guild.id)]["currencySymbol"]+str(amount))
+    cooldown = getUserKey(ctx.author, ctx.guild, 'workCooldown')
+    if cooldown<=0:
+        amount = random.randint(50,200)
+        modifyUserCashBalance(ctx.message.author, ctx.message.guild, amount)
+        await ctx.send("You have made "+servers[str(ctx.message.guild.id)]["currencySymbol"]+str(amount))
+        setUserKey(ctx.author, ctx.guild, 'workCooldown', getServerKey(ctx.guild, 'serverWorkCooldown'))
+    else:
+        await ctx.send(f"You must wait {cooldown} seconds")
 
 @client.command()
 async def pay(ctx, target: discord.Member, amount):
