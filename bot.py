@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import random
 from classes.CardgameUtils import Card, Deck
 import math
@@ -94,6 +94,7 @@ async def on_ready():
     global servers
     servers=json.loads(datastring)
     print(datastring, "\n")
+    dumpJson.start()
 
 @client.event
 async def on_guild_join(guild):
@@ -111,24 +112,24 @@ async def on_guild_join(guild):
 
 
 @client.command()
-async def shop(ctx, *page):
-    #code
+async def shop(ctx, page=1):
+    await ctx.send("Not implemented")
 
 @client.command()
 async def buy(ctx):
-    #code
+    await ctx.send("Not implemented")
 
 @client.command()
 async def sell(ctx): #needs to be discussed for
-    #code
+    await ctx.send("Not implemented")
 
 
 
 
 
 
-@client.command()
-async def dumpJson(ctx):
+@tasks.loop(seconds=1.0)
+async def dumpJson():
     f = open("serverdata.json",'w')
     f.write(json.dumps(servers))
     f.close()
