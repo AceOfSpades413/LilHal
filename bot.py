@@ -102,7 +102,13 @@ def calcScore(cards):
 async def on_ready():
     print("Bot Online!")
     await client.change_presence(activity=discord.Game(name="at the virtual casino"))
-    f=open("serverdata.json",'r')
+    try:
+        f=open("serverdata.json",'r')
+    except:
+        f=open("serverdata.json", "w")
+        f.write('{}')
+        f.close()
+        f=open("serverdata.json",'r')
     datastring=f.readline().strip('\n')
     global servers
     servers=json.loads(datastring)
