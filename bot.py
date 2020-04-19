@@ -32,7 +32,8 @@ def initUserEconomy(user, guild):
         "money":0,
         "bank":0,
         "workCooldown":0,
-        "robCooldown":0
+        "robCooldown":0,
+        "inventory":{}
     }
 
 def modifyUserCashBalance(user, guild, amount):
@@ -124,8 +125,10 @@ async def on_guild_join(guild):
             "roles":{},
             "currencySymbol":'$',
             "serverWorkCooldown":120,
-            "serverRobCooldown":180
+            "serverRobCooldown":180,
+            "serverInventory":{}
         }
+
 
 @client.event
 async def on_guild_remove(guild):
