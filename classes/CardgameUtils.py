@@ -52,6 +52,67 @@ class Deck:
         return counter
 
 
+class UnoCard:
+    def __init__(self, value, color):
+        if isinstance(value, str):
+            if value == "skip":
+                self.value= 10
+            elif value == "reverse":
+                self.value = 11
+            elif value == "draw2":
+                self.value = 12
+            elif value == "wild":
+                self.value = 13
+            elif value == "wilddraw4":
+                self.value = 14
+        else:
+            self.value=value
+        self.color=color
+
+    def getColor(self):
+        return self.color
+
+    def getValue(self):
+        if self.value==10:
+            return "skip"
+        elif self.value ==11:
+            return "reverse"
+        elif self.value==12:
+            return "draw2"
+        elif self.value==13:
+            return "wild"
+        elif self.value==14:
+            return "wilddraw4"
+
+
+class UnoDeck:
+    def __init__(self):
+        self.cards=[]
+        colors=['red','yellow','green','blue']
+        for i in range(12):
+            for color in colors:
+                if i==0:
+                    self.cards.append(UnoCard(i,color))
+                else:
+                    self.cards.append(UnoCard(i, color))
+                    self.cards.append(UnoCard(i, color))
+        for i in range(4):
+            self.cards.append("wild", "none")
+            self.cards.append("wilddraw4", "none")
+
+    def deal(self, num):
+        cards = []
+        for x in range(num):
+            cards.append(self.getRandomCard())
+        return cards
+
+    def getRandomCard(self):
+        pos = random.randint(0, len(self.cards) - 1)
+        card=self.cards[pos]
+        self.cards.pop(pos)
+        return card
+
+
 
 
 
