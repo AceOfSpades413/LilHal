@@ -30,5 +30,13 @@
         "serverWorkCooldown": 120,
         "serverRobCooldown": 180,
         "serverInventory": {}
+    },
+    "701921790280073257": {
+        "users": {},
+        "roles": {},
+        "currencySymbol": "$",
+        "serverWorkCooldown": 120,
+        "serverRobCooldown": 180,
+        "serverInventory": {}
     }
 }
