@@ -85,7 +85,7 @@ class UnoCard:
             return "wilddraw4"
 
     def getEmojiKey(self):
-        return f"{self.value}{self.color}"
+        return f"{self.getValue()}{self.getColor()}"
 
     def getEmojiText(self, emojiDict):
         return emojiDict[self.getEmojiKey()]

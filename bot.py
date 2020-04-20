@@ -179,6 +179,18 @@ async def timeUpdates():
             if(userdata["robCooldown"])>0:
                 userdata["robCooldown"]-=1
 
+@tasks.loop(seconds=1.0)
+async def guildCheck():
+    for guild in client.guilds:
+        if str(guild.id) not in servers:
+            servers[str(guild.id)] = {
+                "users": {},
+                "roles": {},
+                "currencySymbol": '$',
+                "serverWorkCooldown": 120,
+                "serverRobCooldown": 180,
+                "serverInventory": {}
+            }
 
 @client.command()
 async def setCurrencySymbol(ctx, symbol):
