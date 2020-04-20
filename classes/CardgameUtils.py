@@ -103,8 +103,8 @@ class UnoDeck:
                     self.cards.append(UnoCard(i, color))
                     self.cards.append(UnoCard(i, color))
         for i in range(4):
-            self.cards.append("wild", "none")
-            self.cards.append("wilddraw4", "none")
+            self.cards.append(UnoCard("wild", "none"))
+            self.cards.append(UnoCard("wilddraw4", "none"))
 
     def deal(self, num):
         cards = []
