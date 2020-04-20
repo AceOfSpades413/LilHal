@@ -104,16 +104,14 @@ async def on_ready():
     print("Bot Online!")
     await client.change_presence(activity=discord.Game(name="at the virtual casino"))
     try:
-        f=open("serverdata.json",'r')
+        serverdata=open("serverdata.json",'r')
     except:
-        f=open("serverdata.json", "w")
-        f.write('{}')
-        f.close()
-        f=open("serverdata.json",'r')
-    datastring=f.readline().strip('\n')
+        serverdata=open("serverdata.json", "w")
+        serverdata.write('{}')
+        serverdata.close()
+        serverdata=open("serverdata.json",'r')
     global servers
-    servers=json.loads(datastring)
-    print(datastring, "\n")
+    servers=json.load(serverdata)
     dumpJson.start()
     timeUpdates.start()
 
