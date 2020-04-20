@@ -87,6 +87,9 @@ class UnoCard:
     def getEmojiKey(self):
         return f"{self.value}{self.color}"
 
+    def getEmojiText(self, emojiDict):
+        return emojiDict[self.getEmojiKey()]
+
 
 class UnoDeck:
     def __init__(self):
