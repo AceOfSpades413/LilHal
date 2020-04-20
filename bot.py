@@ -15,6 +15,11 @@ activeUsers=[]
 servers={}
 emojiDict={}
 
+#@client.command()
+#async def testEmoji(ctx):
+#    card = UnoCard(14, "none")
+#    await ctx.send(card.getEmojiText(emojiDict))
+
 
 def setUserKey(user, guild, key, value):
     servers[str(guild.id)]["users"][str(user.id)][key]=value
