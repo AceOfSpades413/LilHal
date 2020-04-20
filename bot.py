@@ -167,7 +167,7 @@ async def sell(ctx): #needs to be discussed for
 @tasks.loop(seconds=1.0)
 async def dumpJson():
     f = open("serverdata.json",'w')
-    f.write(json.dumps(servers))
+    f.write(json.dumps(servers, indent=4))
     f.close()
 
 @tasks.loop(seconds=1.0)
