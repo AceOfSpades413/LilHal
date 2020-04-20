@@ -13,6 +13,7 @@ TOKEN = tFile.readline().strip("\n")
 activeUsers=[]
 
 servers={}
+emojiDict={}
 
 
 def setUserKey(user, guild, key, value):
@@ -114,6 +115,15 @@ async def on_ready():
     servers=json.load(serverdata)
     dumpJson.start()
     timeUpdates.start()
+    try:
+        emojidata=open("emojidata.json",'r')
+    except:
+        emojidata=open("emojidata.json", "w")
+        emojidata.write('{}')
+        emojidata.close()
+        emojidata=open("emojidata.json",'r')
+    global emojiDict
+    emojiDict=json.load(emojidata)
 
 @client.event
 async def on_guild_join(guild):
