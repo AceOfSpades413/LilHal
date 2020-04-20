@@ -84,6 +84,9 @@ class UnoCard:
         elif self.value==14:
             return "wilddraw4"
 
+    def getEmojiKey(self):
+        return f"{self.value}{self.color}"
+
 
 class UnoDeck:
     def __init__(self):
