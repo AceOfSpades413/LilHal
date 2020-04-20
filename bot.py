@@ -124,6 +124,7 @@ async def on_ready():
         emojidata=open("emojidata.json",'r')
     global emojiDict
     emojiDict=json.load(emojidata)
+    guildCheck.start()
 
 @client.event
 async def on_guild_join(guild):
