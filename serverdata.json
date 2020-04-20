@@ -1,0 +1,34 @@
+{
+    "694317511742849144": {
+        "users": {
+            "175409219107815424": {
+                "money": 0,
+                "bank": 134,
+                "workCooldown": 0,
+                "robCooldown": 0,
+                "inventory": {}
+            }
+        },
+        "roles": {},
+        "currencySymbol": "$",
+        "serverWorkCooldown": 120,
+        "serverRobCooldown": 180,
+        "serverInventory": {}
+    },
+    "701920429912096888": {
+        "users": {
+            "175409219107815424": {
+                "money": 0,
+                "bank": 0,
+                "workCooldown": 0,
+                "robCooldown": 0,
+                "inventory": {}
+            }
+        },
+        "roles": {},
+        "currencySymbol": "$",
+        "serverWorkCooldown": 120,
+        "serverRobCooldown": 180,
+        "serverInventory": {}
+    }
+}
