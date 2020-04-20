@@ -118,7 +118,7 @@ class UnoDeck:
         self.cards.pop(pos)
         return card
 
-    def returnCards(self):
+    def getCards(self):
         return self.cards
 
 
