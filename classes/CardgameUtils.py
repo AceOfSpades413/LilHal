@@ -120,6 +120,12 @@ class UnoDeck:
         self.cards.pop(pos)
         return card
 
+    def getCardsLeft(self):
+        counter=0
+        for card in self.cards:
+            counter+=1
+        return counter
+
     def getCards(self):
         return self.cards
 
