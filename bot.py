@@ -15,17 +15,6 @@ activeUsers=[]
 servers={}
 emojiDict={}
 
-@client.command()
-async def testEmoji(ctx):
-    unoDeck = UnoDeck()
-    cardString=""
-    for card in unoDeck.getCards():
-        try:
-            cardString += f"{card.getEmojiText(emojiDict)}\n"
-        except:
-            cardString += f"{card.getEmojiKey()}\n"
-    await ctx.send(cardString)
-
 
 def setUserKey(user, guild, key, value):
     servers[str(guild.id)]["users"][str(user.id)][key]=value
