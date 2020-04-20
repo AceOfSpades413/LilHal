@@ -83,6 +83,8 @@ class UnoCard:
             return "wild"
         elif self.value==14:
             return "wilddraw4"
+        else:
+            return self.value
 
     def getEmojiKey(self):
         return f"{self.getValue()}{self.getColor()}"
