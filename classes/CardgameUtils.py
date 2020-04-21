@@ -1,9 +1,10 @@
 import random
 
 class Card:
-    def __init__(self, value, suit):
+    def __init__(self, value, suit, emojiDict):
         self.value=value
         self.suit=suit
+        self.emojiDict=emojiDict
 
     def getSuit(self):
         return self.suit
@@ -26,16 +27,16 @@ class Card:
         return emojiDict[f"{self.getCardFace()}{self.getSuit()}"]
 
     def __str__(self):
-        return str(self.getCardFace()) + self.getSuit()
+        return self.getEmojiText(self.emojiDict)
 
 class Deck:
-    def __init__(self):
+    def __init__(self, emojiDict):
         self.cards = []
         for i in range(2, 15):
-            self.cards.append(Card(i, "hearts"))
-            self.cards.append(Card(i, "diamonds"))
-            self.cards.append(Card(i, "spades"))
-            self.cards.append(Card(i, "clubs"))
+            self.cards.append(Card(i, "hearts", emojiDict))
+            self.cards.append(Card(i, "diamonds", emojiDict))
+            self.cards.append(Card(i, "spades", emojiDict))
+            self.cards.append(Card(i, "clubs", emojiDict))
 
     def deal(self, num):
         cards = []

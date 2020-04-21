@@ -402,7 +402,7 @@ async def bj(ctx, money="failure"):
     dealerScore=0
     moveCounterDealer=0
     moveCounterPlayer=0
-    deck = Deck()
+    deck = Deck(emojiDict)
     playerHand = deck.deal(2) #gives player 2 cards
     dealerHand = deck.deal(2) #gives dealer 2 cards
 
