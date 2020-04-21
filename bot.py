@@ -349,9 +349,9 @@ async def lb(ctx):
 async def uno(ctx):
     embed=discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
     thisMessage = await ctx.send(embed=embed)
-    await thisMessage.add_reaction("<:C0:701923949298188378>")
+    await thisMessage.add_reaction("<:W4:702235282556059719>")
     players=[]
-    for i in range(10,0, -1):
+    for i in range(30,0, -1):
         players=[]
         thisMessage = await ctx.fetch_message(thisMessage.id)
         newEmbed=discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
