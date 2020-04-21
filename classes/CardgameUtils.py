@@ -21,6 +21,10 @@ class Card:
             return 'J'
         else:
             return self.value
+
+    def getEmojiText(self, emojiDict):
+        return emojiDict[f"{self.getCardFace()}{self.getSuit()}"]
+
     def __str__(self):
         return str(self.getCardFace()) + self.getSuit()
 
@@ -28,10 +32,10 @@ class Deck:
     def __init__(self):
         self.cards = []
         for i in range(2, 15):
-            self.cards.append(Card(i, ":hearts:"))
-            self.cards.append(Card(i, ":diamonds:"))
-            self.cards.append(Card(i, ":spades:"))
-            self.cards.append(Card(i, ":clubs:"))
+            self.cards.append(Card(i, "hearts"))
+            self.cards.append(Card(i, "diamonds"))
+            self.cards.append(Card(i, "spades"))
+            self.cards.append(Card(i, "clubs"))
 
     def deal(self, num):
         cards = []
