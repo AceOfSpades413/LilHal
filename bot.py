@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 import random
-from classes.CardgameUtils import Card, Deck, UnoDeck, UnoCard
+from classes.CardgameUtils import Card, Deck, UnoDeck, UnoCard, UnoPlayer
 import math
 import json
 import time
@@ -351,7 +351,7 @@ async def uno(ctx):
     thisMessage = await ctx.send(embed=embed)
     await thisMessage.add_reaction("<:C0:701923949298188378>")
     players=[]
-    for i in range(30,0, -1):
+    for i in range(10,0, -1):
         players=[]
         thisMessage = await ctx.fetch_message(thisMessage.id)
         newEmbed=discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
@@ -375,6 +375,26 @@ async def uno(ctx):
     else:
         newEmbed.set_footer(text="Sign up complete... wait for game!")
         await thisMessage.edit(embed=newEmbed)
+
+        gameMessage = gameEmbed=discord.Embed(title="Uno", description="Game Started")
+        await thisMessage.edit(embed=gameMessage)
+        deck = UnoDeck(emojiDict)
+        playerList={}
+        for player in players:
+            playerList[str(player.id)]={}
+            playerList[str(player.id)]['player']=UnoPlayer()
+            playerList[str(player.id)]['player'].addCards(deck.deal(7))
+            playerEmbed=discord.Embed(title="Uno")
+            handString=""
+            for card in playerList[str(player.id)]['player'].getCards():
+                playerEmbed.add_field(name=card)
+
+
+            playerList[str(player.id)]['privateMessage']=await player.send(embed=playerEmbed)
+
+
+
+
 
 
 

@@ -58,7 +58,7 @@ class Deck:
 
 
 class UnoCard:
-    def __init__(self, value, color):
+    def __init__(self, value, color, emojiDict):
         if isinstance(value, str):
             if value == "skip":
                 self.value= 10
@@ -73,6 +73,7 @@ class UnoCard:
         else:
             self.value=value
         self.color=color
+        self.emojiDict=emojiDict
 
     def getColor(self):
         return self.color
@@ -97,21 +98,24 @@ class UnoCard:
     def getEmojiText(self, emojiDict):
         return emojiDict[self.getEmojiKey()]
 
+    def __str__(self):
+        return self.getEmojiText(self.emojiDict)
+
 
 class UnoDeck:
-    def __init__(self):
+    def __init__(self, emojiDict):
         self.cards=[]
         colors=['red','yellow','green','blue']
         for i in range(12):
             for color in colors:
                 if i==0:
-                    self.cards.append(UnoCard(i,color))
+                    self.cards.append(UnoCard(i,color,emojiDict))
                 else:
-                    self.cards.append(UnoCard(i, color))
-                    self.cards.append(UnoCard(i, color))
+                    self.cards.append(UnoCard(i, color,emojiDict))
+                    self.cards.append(UnoCard(i, color,emojiDict))
         for i in range(4):
-            self.cards.append(UnoCard("wild", "none"))
-            self.cards.append(UnoCard("wilddraw4", "none"))
+            self.cards.append(UnoCard("wild", "none",emojiDict))
+            self.cards.append(UnoCard("wilddraw4", "none",emojiDict))
 
     def deal(self, num):
         cards = []
@@ -133,3 +137,19 @@ class UnoDeck:
 
     def getCards(self):
         return self.cards
+
+class UnoPlayer:
+
+    def __init__(self):
+        self.cards=[]
+
+    def addCards(self, cards):
+        for card in cards:
+            self.cards.append(card)
+
+    def getCards(self):
+        cards=[]
+        for card in self.cards:
+            cards.append(card)
+        return cards
+
