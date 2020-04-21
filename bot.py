@@ -4,6 +4,7 @@ import random
 from classes.CardgameUtils import Card, Deck, UnoDeck, UnoCard
 import math
 import json
+import time
 
 client = commands.Bot(command_prefix='!', case_insensitive=True)
 client.remove_command('help')
@@ -343,6 +344,39 @@ async def lb(ctx):
         count+=1
     embed.add_field(name="Leaders", value=leaderString)
     await ctx.send(embed=embed)
+
+@client.command()
+async def uno(ctx):
+    embed=discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
+    thisMessage = await ctx.send(embed=embed)
+    await thisMessage.add_reaction("<:C0:701923949298188378>")
+    players=[]
+    for i in range(30,0, -1):
+        players=[]
+        thisMessage = await ctx.fetch_message(thisMessage.id)
+        newEmbed=discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
+        newEmbed.set_footer(text=f"{i} seconds left to sign up")
+        for reaction in thisMessage.reactions:
+            async for user in reaction.users():
+                if user not in players and user != client.user:
+                    players.append(user)
+        if len(players)>0:
+            playerString=""
+            for player in players:
+                playerString+=f"{player.name}\n"
+
+            newEmbed.add_field(name="Players", value=playerString, inline=False)
+
+        await thisMessage.edit(embed=newEmbed)
+        time.sleep(1)
+    if len(players)<=1:
+        newEmbed=embed
+        newEmbed.set_footer(text="Nobody wants to play!")
+    else:
+        newEmbed.set_footer(text="Sign up complete... wait for game!")
+        await thisMessage.edit(embed=newEmbed)
+
+
 
 @client.command()
 async def bj(ctx, money="failure"):
