@@ -4,7 +4,7 @@ import random
 from classes.CardgameUtils import Card, Deck, UnoDeck, UnoCard, UnoPlayer
 import math
 import json
-import time
+import asyncio
 
 client = commands.Bot(command_prefix='!', case_insensitive=True)
 client.remove_command('help')
@@ -378,7 +378,7 @@ async def uno(ctx):
             newEmbed.add_field(name="Players", value=playerString, inline=False)
 
         await thisMessage.edit(embed=newEmbed)
-        time.sleep(1)
+        await asyncio.sleep(1)
     if len(players)<=1:
         newEmbed=embed
         newEmbed.set_footer(text="Nobody wants to play!")
