@@ -17,6 +17,16 @@ servers={}
 emojiDict={}
 
 
+@client.event
+async def on_message(message):
+    if "lil hal" in message.content.lower() or "lilhal" in message.content.lower():
+        response = "```diff\n" + """- It seems you have asked about DS's chat client auto-responder. This is an application designed to simulate DS's otherwise inimitably rad typing style, 
+tone, cadence, personality, and substance of retort while he is away from the computer. The algorithms are guaranteed to be 9X% indistinguishable 
+from DS's native neurological responses, based on some statistical analysis I basically just pulled out of my ass right now.```""".replace('\n','')
+        await message.channel.send(response)
+
+    await client.process_commands(message)
+
 def setUserKey(user, guild, key, value):
     servers[str(guild.id)]["users"][str(user.id)][key]=value
 
