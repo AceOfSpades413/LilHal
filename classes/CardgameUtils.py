@@ -1,4 +1,5 @@
 import random
+import discord
 
 class Card:
     def __init__(self, value, suit, emojiDict):
@@ -140,16 +141,32 @@ class UnoDeck:
 
 class UnoPlayer:
 
-    def __init__(self):
+    def __init__(self, user):
         self.cards=[]
+        self.user=user
+        self.handMessageId=""
+
+    def setHandMessageId(self, newId):
+        self.handMessageId = newId
 
     def addCards(self, cards):
         for card in cards:
             self.cards.append(card)
+
+    def getUsername(self):
+        return self.user.name
+
+    def getUser(self):
+        return self.user
 
     def getCards(self):
         cards=[]
         for card in self.cards:
             cards.append(card)
         return cards
+
+    def getCardsLeft(self):
+        return len(self.cards)
+
+    #def playCard(self):
 
