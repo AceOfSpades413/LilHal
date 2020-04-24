@@ -149,6 +149,9 @@ class GamePlayer:
     def setHandMessageId(self, newId):
         self.handMessageId = newId
 
+    def getHandMessageId(self):
+        return self.handMessageId
+
     def addCards(self, cards):
         for card in cards:
             self.cards.append(card)
@@ -172,5 +175,5 @@ class GamePlayer:
         if card in self.cards:
             self.cards.remove(card)
             return card
-        
+
 
