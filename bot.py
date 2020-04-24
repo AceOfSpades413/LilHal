@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from classes.CardgameUtils import Card, Deck, UnoDeck, UnoCard, UnoPlayer
+from classes.CardgameUtils import Card, Deck, UnoDeck, UnoCard, GamePlayer
 import math, random
 import json, copy
 import asyncio
@@ -97,6 +97,25 @@ def calcScore(cards):
             else:
                 score+=11
     return score
+
+def calcHand(cards, pot):
+    for i in pot:
+        cards.append(i)
+    cardSymbols = []
+    for i in cards:
+        count=0
+        for e in i:
+            if (count == 2 or count == 3):
+                print (e)
+                cardSymbols.append(e)
+            count+=1
+    cardList={
+        {
+            
+        }
+    }
+
+
 
 
 
@@ -352,6 +371,7 @@ async def lb(ctx):
 
 
 async def gameStart(gamename, emoji, maxPlayers, ctx):
+
     embed = discord.Embed(title=f"{gamename}", description=f"Started by {ctx.author}")
     thisMessage = await ctx.send(embed=embed)
     await thisMessage.add_reaction(emoji)
@@ -359,7 +379,7 @@ async def gameStart(gamename, emoji, maxPlayers, ctx):
     for i in range(10, 0, -1):
         players = []
         thisMessage = await ctx.fetch_message(thisMessage.id)
-        newEmbed = discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
+        newEmbed = discord.Embed(title=f"{gamename}", description=f"Started by {ctx.author}")
         newEmbed.set_footer(text=f"{i} seconds left to sign up")
         for reaction in thisMessage.reactions:
             async for user in reaction.users():
@@ -392,7 +412,7 @@ async def uno(ctx):
     deck = UnoDeck(emojiDict)
     playerObjects=[]
     for player in players:
-        currentPlayer=UnoPlayer(player)
+        currentPlayer=GamePlayer(player)
         playerObjects.append(currentPlayer)
         currentPlayer.addCards(deck.deal(7))
         playerEmbed=discord.Embed(title="Uno")
@@ -460,6 +480,42 @@ async def uno(ctx):
 
         if playerCounter==len(playerObjects):
             won=True
+
+
+
+@client.command(aliases=['pkr'])
+async def poker(ctx, buyIn="no buy in"):
+    if buyIn == "no buy in":
+        await ctx.send("no buy in specified")
+        return
+    else:
+        print(buyIn)
+    try:
+        players = await gameStart(f"Poker\t\tbuy in:{buyIn}", "<:AS:702234100836335636>", 8, ctx)
+    except:
+        return
+    deck = Deck(emojiDict)
+    potCards=[]
+    playerObjects = []
+    print (players)
+
+    for player in players:
+        currentPlayer = GamePlayer(player)
+        playerObjects.append(currentPlayer)
+        currentPlayer.addCards(deck.deal(2))
+        playerEmbed = discord.Embed(title=f"Poker\t\tchips: {buyIn}")
+        handString = ""
+        handList = []
+        for card in currentPlayer.getCards():
+            handList.append(str(card))
+        calcHand(handList, potCards)
+        for i in handList:
+            handString+=i
+        playerEmbed.add_field(name="Your Hand:", value=handString)
+        currentPlayer.setHandMessageId(await player.send(embed=playerEmbed))
+
+
+
 
 
 

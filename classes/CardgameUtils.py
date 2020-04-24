@@ -139,7 +139,7 @@ class UnoDeck:
     def getCards(self):
         return self.cards
 
-class UnoPlayer:
+class GamePlayer:
 
     def __init__(self, user):
         self.cards=[]
