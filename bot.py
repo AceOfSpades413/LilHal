@@ -351,52 +351,118 @@ async def lb(ctx):
 
 
 
-@client.command()
-async def uno(ctx):
-    embed=discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
+async def gameStart(gamename, emoji, maxPlayers, ctx):
+    embed = discord.Embed(title=f"{gamename}", description=f"Started by {ctx.author}")
     thisMessage = await ctx.send(embed=embed)
-    await thisMessage.add_reaction("<:W4:702235282556059719>")
-    players=[]
-    for i in range(30,0, -1):
-        players=[]
+    await thisMessage.add_reaction(emoji)
+    players = []
+    for i in range(10, 0, -1):
+        players = []
         thisMessage = await ctx.fetch_message(thisMessage.id)
-        newEmbed=discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
+        newEmbed = discord.Embed(title=f"Uno", description=f"Started by {ctx.author}")
         newEmbed.set_footer(text=f"{i} seconds left to sign up")
         for reaction in thisMessage.reactions:
             async for user in reaction.users():
                 if user not in players and user != client.user:
                     players.append(user)
-        if len(players)>0:
-            playerString=""
+        if len(players) > 0:
+            playerString = ""
             for player in players:
-                playerString+=f"{player.name}\n"
+                playerString += f"{player.name}\n"
 
             newEmbed.add_field(name="Players", value=playerString, inline=False)
 
         await thisMessage.edit(embed=newEmbed)
         await asyncio.sleep(1)
-    if len(players)<=1:
-        newEmbed=embed
+    if len(players) <= 1:
+        newEmbed = embed
         newEmbed.set_footer(text="Nobody wants to play!")
     else:
         newEmbed.set_footer(text="Sign up complete... wait for game!")
         await thisMessage.edit(embed=newEmbed)
+        return players
 
-        gameMessage = gameEmbed=discord.Embed(title="Uno", description="Game Started")
-        await thisMessage.edit(embed=gameMessage)
-        deck = UnoDeck(emojiDict)
-        playerList={}
-        for player in players:
-            playerList[str(player.id)]={}
-            playerList[str(player.id)]['player']=UnoPlayer()
-            playerList[str(player.id)]['player'].addCards(deck.deal(7))
-            playerEmbed=discord.Embed(title="Uno")
-            handString=""
-            for card in playerList[str(player.id)]['player'].getCards():
-                playerEmbed.add_field(name=card)
+@client.command()
+async def uno(ctx):
+    try:
+        players=await gameStart("Uno", "<:W4:702235282556059719>", 8, ctx)
+    except:
+        return
+
+    deck = UnoDeck(emojiDict)
+    playerObjects=[]
+    for player in players:
+        currentPlayer=UnoPlayer(player)
+        playerObjects.append(currentPlayer)
+        currentPlayer.addCards(deck.deal(7))
+        playerEmbed=discord.Embed(title="Uno")
+        handString=""
+        for card in currentPlayer.getCards():
+            handString+=str(card)
+        playerEmbed.add_field(name="Your Hand:", value=handString)
+        currentPlayer.setHandMessageId(await player.send(embed=playerEmbed))
+
+    playedCards=[]
+    playedCards.append(deck.getRandomCard())
+    won=False
+    playerCounter = 0
+    publicEmbed = discord.Embed(title="Uno Game")
+    publicEmbed.add_field(name="Current Card:", value=playedCards[len(playedCards) - 1])
+
+    playerString = ""
+    for player in playerObjects:
+        thingepic = ""
+        if (player) == playerObjects[playerCounter]:
+            thingepic = "**>**"
+        playerString += f"{thingepic}{player.getUsername()}: {player.getCardsLeft()}\n"
+    publicEmbed.add_field(name="Player List/Cards Left:", value=playerString)
+    publicMessage = await ctx.send(embed=publicEmbed)
+    while not won:
+        currentCard=playedCards[len(playedCards) - 1]
+
+        # Begin player specific shit
+        for player in playerObjects:
+            if playerObjects.index(player)==playerCounter:
+                playerEmbed=copy.copy(publicEmbed)
+                currentMessage = await player.getUser().send(embed=playerEmbed)
+                evaluatedCards=[]
+                notPlayableCards=[]
+                for card in player.getCards():
+                    if card not in evaluatedCards:
+                        if card.getColor()==currentCard.getColor() or card.getValue()== card.getValue() or card.getValue in ["wild", "wilddraw4"]:
+                            evaluatedCards.append(card)
+                        else:
+                            notPlayableCards.append(card)
+                for card in evaluatedCards:
+                    await currentMessage.add_reaction(str(card))
+                unplayableString=""
+                for card in notPlayableCards:
+                    unplayableString+=str(card)
+                playerEmbed.add_field(name="Unplayable Cards:", value=unplayableString)
 
 
-            playerList[str(player.id)]['privateMessage']=await player.send(embed=playerEmbed)
+
+        playerCounter+=1
+
+
+        # Update Public Embed
+        publicEmbed=discord.Embed(title="Uno Game")
+        publicEmbed.add_field(name="Current Card:", value=playedCards[len(playedCards)-1])
+
+        playerString=""
+        for player in playerObjects:
+            thingepic=""
+            if(player)==playerObjects[playerCounter]:
+                thingepic="**>**"
+            playerString+=f"{thingepic}{player.getUsername()}: {player.getCardsLeft()}\n"
+        publicEmbed.add_field(name="Player List/Cards Left:", value=playerString)
+        await publicMessage.edit(embed=publicEmbed)
+
+        if playerCounter==len(playerObjects):
+            won=True
+
+
+
 
 
 
