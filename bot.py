@@ -444,21 +444,33 @@ async def uno(ctx):
         for player in playerObjects:
             if playerObjects.index(player)==playerCounter:
                 playerEmbed=copy.copy(publicEmbed)
-                currentMessage = await player.getUser().send(embed=playerEmbed)
+
                 evaluatedCards=[]
                 notPlayableCards=[]
                 for card in player.getCards():
-                    if card not in evaluatedCards:
-                        if card.getColor()==currentCard.getColor() or card.getValue()== card.getValue() or card.getValue in ["wild", "wilddraw4"]:
-                            evaluatedCards.append(card)
-                        else:
-                            notPlayableCards.append(card)
+                    if (card.getColor()==currentCard.getColor() or card.getValue()== card.getValue() or card.getValue in ["wild", "wilddraw4"]) and card not in evaluatedCards:
+                        evaluatedCards.append(card)
+                    else:
+                        notPlayableCards.append(card)
+                unplayableString = ""
+                for card in notPlayableCards:
+                    unplayableString += str(card)
+                playerEmbed.add_field(name="Unplayable Cards:", value=unplayableString)
+
+                currentMessage = await player.getUser().send(embed=playerEmbed)
                 for card in evaluatedCards:
                     await currentMessage.add_reaction(str(card))
-                unplayableString=""
-                for card in notPlayableCards:
-                    unplayableString+=str(card)
-                playerEmbed.add_field(name="Unplayable Cards:", value=unplayableString)
+
+                if len(evaluatedCards)==0:
+                    playerEmbed.set_footer(text="You have no playable cards, drawing 1 card")
+                    player.addCards(deck.getRandomCard())
+                    for card in currentPlayer.getCards():
+                        handString += str(card)
+                    handEmbed = discord.Embed(title="Uno")
+                    handEmbed.add_field(name="Your Hand:", value=handString)
+                    await player.getHandMessageId().edit(embed=handEmbed)
+                #Else wait for react stuff
+
 
 
 
