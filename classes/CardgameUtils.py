@@ -168,5 +168,9 @@ class GamePlayer:
     def getCardsLeft(self):
         return len(self.cards)
 
-    #def playCard(self):
+    def playCard(self, card):
+        if card in self.cards:
+            self.cards.remove(card)
+            return card
+        
 
