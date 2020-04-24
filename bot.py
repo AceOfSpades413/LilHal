@@ -1,9 +1,8 @@
 import discord
 from discord.ext import commands, tasks
-import random
 from classes.CardgameUtils import Card, Deck, UnoDeck, UnoCard, UnoPlayer
-import math
-import json
+import math, random
+import json, copy
 import asyncio
 
 client = commands.Bot(command_prefix='!', case_insensitive=True)
