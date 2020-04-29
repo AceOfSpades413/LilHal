@@ -98,22 +98,102 @@ def calcScore(cards):
                 score+=11
     return score
 
-def calcHand(cards, pot):
-    for i in pot:
-        cards.append(i)
-    cardSymbols = []
-    for i in cards:
-        count=0
-        for e in i:
-            if (count == 2 or count == 3):
-                print (e)
-                cardSymbols.append(e)
-            count+=1
-    cardList={
-        {
-            
-        }
-    }
+def calcHand(cards):
+    values = []
+    suits = []
+    print (cards)
+    for card in cards:
+        suits.append(card.getSuit())
+    print(suits)
+    for card in cards:
+        values.append(card.getNumberValue())
+    print(values)
+    pair = "false"
+    for i in range(4):
+        e = i+1
+        if pair == "false":
+            while e < 5:
+                if values[i] == values[e]:
+                    number = values[i]
+                    pair="true"
+                    values.remove(values[i])
+                    values.remove(values[e-1])
+                    print(values)
+                    e=5
+                e += 1
+    if pair=="true":
+        threeOfKind="false"
+        for i in range(2):
+            if values[i] == number:
+                threeOfKind="true"
+                values.remove(values[i])
+                print("is three of a kind")
+        if threeOfKind == "true":
+            fourOfKind="false"
+            for i in range(1):
+                if values[i] == number:
+                    return 8 #four of a kind
+            if fourOfKind == "false":
+                fullHouse = "false"
+                if values[0] == values[1]:
+                    fullHouse = "true"
+                    return 7 #full house
+                elif fullHouse == "false":
+                    return 4 #three of a kind
+        else:
+            twoPair = "false"
+            for i in range(2):
+                e = i + 1
+                while e < 3:
+                    if values[i] == values[e]:
+                        twpPair = "true"
+                        values.remove(values[i])
+                        values.remove(values[e])
+                        return 3 #two pair
+                    e += 1
+            if twoPair != "true":
+                return 2 #one pair
+
+
+
+
+
+    else:
+        flush = "false"
+        if suits[0] == suits[1] and suits[0] == suits[2] and suits[0] == suits[3] and suits[0] == suits[4]:
+            flush = "true"
+            valuesTemp = values
+            valuesTemp.sort()
+            straightFlush = "false"
+            for i in range(4):
+                if valuesTemp[0]!=valuesTemp[i]-i:
+                    return 6 #flush
+                else:
+                    if valuesTemp[4] == 14:
+                        return 10 #royal flush
+                    else:
+                        return 9 #straight flush
+        else:
+            valuesTemp = values
+            valuesTemp.sort()
+            straight = "false"
+            for i in range(4):
+                if valuesTemp[0] != valuesTemp[i]-i:
+                    return 1  #high card
+                else:
+                    return 5 #straight
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -503,28 +583,50 @@ async def poker(ctx, buyIn="no buy in"):
     else:
         print(buyIn)
     try:
-        players = await gameStart(f"Poker\t\tbuy in:{buyIn}", "<:AS:702234100836335636>", 8, ctx)
+        players = await gameStart(f"Poker\t\tbuy in: {buyIn}", "<:AS:702234100836335636>", 8, ctx)
     except:
         return
     deck = Deck(emojiDict)
-    potCards=[]
-    playerObjects = []
-    print (players)
+    playerList=[]
+    for player in players: #gives everyone their specified chips
+        playerObj = GamePlayer(player)
+        playerObj.addChips(int(buyIn))
+        playerList.append(player)
+    gameWon = "false"
+    while gameWon == "false":
+        for player in players:
+            currentPlayer = GamePlayer(player)
+            playerList.append(currentPlayer)
+            currentPlayer.addCards(deck.deal(5))
+            playerEmbed = discord.Embed(title="Poker")
+            handString = ""
+            handList = []
+            for card in currentPlayer.getCards():
+                handString += str(card)
+                handList.append(card)
+            number = calcHand(handList)
+            print (number)
+            playerEmbed.add_field(name="Your Hand:", value=handString)
+            currentMessage = await currentPlayer.getUser().send(embed=playerEmbed)
+            for card in currentPlayer.getCards():
+                await currentMessage.add_reaction(str(card))
+        return
 
-    for player in players:
-        currentPlayer = GamePlayer(player)
-        playerObjects.append(currentPlayer)
-        currentPlayer.addCards(deck.deal(2))
-        playerEmbed = discord.Embed(title=f"Poker\t\tchips: {buyIn}")
-        handString = ""
-        handList = []
-        for card in currentPlayer.getCards():
-            handList.append(str(card))
-        calcHand(handList, potCards)
-        for i in handList:
-            handString+=i
-        playerEmbed.add_field(name="Your Hand:", value=handString)
-        currentPlayer.setHandMessageId(await player.send(embed=playerEmbed))
+
+
+
+        #for playerObj in players: #removes those who have lost
+        #    if playerObj.getChips() <= 0:
+        #        players.remove(player)
+
+        #if players.len() == 1: #if someone has won, ends the game and gives them money
+        #    gameWon = "true"
+        #    for playerObj in players:
+        #        modifyUserCashBalance(playerObj, ctx.guild, int(player.getChips()))
+
+
+
+
 
 
 

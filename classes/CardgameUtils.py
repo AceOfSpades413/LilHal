@@ -57,7 +57,6 @@ class Deck:
             counter+=1
         return counter
 
-
 class UnoCard:
     def __init__(self, value, color, emojiDict):
         if isinstance(value, str):
@@ -102,7 +101,6 @@ class UnoCard:
     def __str__(self):
         return self.getEmojiText(self.emojiDict)
 
-
 class UnoDeck:
     def __init__(self, emojiDict):
         self.cards=[]
@@ -145,6 +143,7 @@ class GamePlayer:
         self.cards=[]
         self.user=user
         self.handMessageId=""
+        self.chips=0
 
     def setHandMessageId(self, newId):
         self.handMessageId = newId
@@ -155,6 +154,19 @@ class GamePlayer:
     def addCards(self, cards):
         for card in cards:
             self.cards.append(card)
+
+    def addChips(self, chips):
+        self.chips -= chips
+
+    def removeChips(self, chips):
+        self.chips -= chips
+
+    def getChips(self):
+        return self.chips
+
+    def removeCards(self, cards):
+        for card in cards:
+            self.cards.remove(card)
 
     def getUsername(self):
         return self.user.name
@@ -175,5 +187,3 @@ class GamePlayer:
         if card in self.cards:
             self.cards.remove(card)
             return card
-
-
